@@ -9,7 +9,7 @@ s_conn = sqlite3.connect("safety.sqlite")
 
 @app.get("/")
 def root():
-    return {"message": "Hello world"}
+    return {"message": "WSDOT Safety Incident Data API"}
 
     
 @app.get("/vehicles/{incident_rec_id}")
