@@ -1,12 +1,10 @@
 
 from fastapi import FastAPI, HTTPException
-import psrcelmerpy
 import pandas as pd
 import sqlite3
 
 app  = FastAPI()
 
-e_conn = psrcelmerpy.ElmerConn()
 s_conn = sqlite3.connect("safety.sqlite")
 
 @app.get("/")
@@ -22,7 +20,6 @@ async def get_vehicles_by_id(incident_rec_id: int):
             join vehicles as v on i.incident_rec_id = v.incident_rec_id 
         where i.incident_rec_id = {incident_rec_id}
         """
-    # df = e_conn.get_query(qry)
     df = pd.read_sql(qry, s_conn)
     return df.to_json(force_ascii=True)
     
@@ -44,7 +41,6 @@ async def get_persons_by_id(incident_rec_id: int):
                 join persons as p on v.vehicle_rec_id = p.vehicle_rec_id
             where i.incident_rec_id = {incident_rec_id}
             """
-        # df = e_conn.get_query(qry)
         df_person = pd.read_sql(qry_person, s_conn)
 
         structured_data = {
