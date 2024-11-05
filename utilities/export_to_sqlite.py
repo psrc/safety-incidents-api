@@ -2,7 +2,7 @@ import pandas as pd
 import psrcelmerpy
 import sqlite3 
 
-sqlite_path = "../main/safety.sqlite"
+sqlite_path = "./main/safety.sqlite"
 
 e_conn = psrcelmerpy.ElmerConn()
 sqlite_conn =  sqlite3.connect(sqlite_path)
@@ -16,5 +16,7 @@ for tbl_nm in tbls:
     df.to_sql(tbl_nm, sqlite_conn, if_exists='replace', index=False)
     rows_processed = len(df)
     print(f"Processed {rows_processed} rows for {tbl_nm}")
+
+print(f"export completed for {sqlite_path}")
 
 sqlite_conn.close()
