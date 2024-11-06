@@ -23,6 +23,7 @@ async def get_vehicles_by_id(incident_rec_id: int):
     df = pd.read_sql(qry, s_conn)
     return df.to_json(force_ascii=True)
     
+
 @app.get("/persons/{incident_rec_id}")
 async def get_persons_by_id(incident_rec_id: int):
     try:
