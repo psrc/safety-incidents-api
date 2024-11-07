@@ -11,6 +11,16 @@ s_conn = sqlite3.connect("safety.sqlite")
 def root():
     return {"message": "WSDOT Safety Incident Data API"}
 
+
+@app.get("/incidents")
+async def get_incidents():
+    qry = """
+        select i.Collision_report_number, i.incident_date
+        from incidents as i
+    """
+    df = pd.read_sql(qry, s_conn)
+    return df.to_dict(orient='records')
+    
     
 @app.get("/vehicles/{collision_report_number}")
 async def get_vehicles_by_id(collision_report_number: str):
