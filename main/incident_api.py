@@ -5,8 +5,6 @@ import sqlite3
 
 app  = FastAPI()
 
-s_conn = sqlite3.connect("safety.sqlite")
-
 
 def get_db_connection():
     return sqlite3.connect("safety.sqlite")
