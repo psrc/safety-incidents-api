@@ -16,7 +16,7 @@ for tbl_nm in tbls:
         FROM safety.{tbl_nm} 
     """
     df = e_conn.get_query(query)
-    df.to_sql(tbl_nm, sqlite_conn, if_exists='replace', index=False)
+    df.to_sql(tbl_nm.capitalize(), sqlite_conn, if_exists='replace', index=False)
     rows_processed = len(df)
     print(f"Processed {rows_processed} rows for {tbl_nm}")
 

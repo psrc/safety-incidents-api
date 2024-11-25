@@ -7,7 +7,7 @@ app  = FastAPI()
 
 
 def get_db_connection():
-    return sqlite3.connect("safety.sqlite")
+    return sqlite3.connect("safety2.sqlite")
 
 
 @app.get("/")
