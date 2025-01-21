@@ -1,6 +1,6 @@
 
 from fastapi import Depends, FastAPI, HTTPException, Query
-from typing import Optional, Dict, Type
+from typing import Optional, Dict, Type, List
 import pandas as pd
 import sqlite3
 from typing import Annotated
@@ -33,8 +33,6 @@ def get_pk(table_name: str):
 
 engine, metadata = get_db_connection()
 
-#SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 
 def get_session():
     #session = SessionLocal()
@@ -48,6 +46,13 @@ def get_session():
 class Incident(SQLModel, table=True):
     Collision_Report_Number: str = Field(primary_key=True)
     incident_date: str = Field()
+    City_Name: str = Field()
+
+class Vehicle(SQLModel, table=True):
+    vehicle_rec_id: int = Field(primary_key=True)
+    unit_number: int = Field()
+    Vehicle_Type: str = Field()
+    #Collision_Report_Number: Optional(str) = Field(default=None, foreign_key="Incident.Collision_Report_Number")
 
 
 app  = FastAPI()
@@ -58,7 +63,6 @@ def root():
 
 @app.get("/incidents/{Collision_Report_Number}", response_model=Incident)
 async def get_incident(Collision_Report_Number: str):
-    # Incident = models['incidents']
     with Session(engine) as session:
         incidents = session.get(Incident, Collision_Report_Number)
         if not incidents:
@@ -66,7 +70,12 @@ async def get_incident(Collision_Report_Number: str):
         return incidents
 
 
-    
+@app.get("/incidents_by_city/{city_name}", response_model=List[Incident])
+async def get_incidents_by_city(city_name: str):
+    with Session(engine) as session:
+        statement = select(Incident).where(Incident.City_Name == city_name)
+        results = session.exec(statement)
+        return results.all()
     
 # @app.get("/vehicles/{collision_report_number}")
 # async def get_vehicles_by_id(collision_report_number: str):

@@ -10,8 +10,8 @@ sqlite_conn =  sqlite3.connect(sqlite_path)
 # tbls = ['incidents', 'vehicles', 'persons']
 
 tbls = {
-    'incident': ['incident_rec_id', 'Collision_Report_Number', 'incident_date'],
-    'vehicle': ['vehicle_rec_id', 'unit_number', 'Vehicle_Type'],
+    'incident': ['incident_rec_id', 'Collision_Report_Number', 'incident_date', 'City_Name', 'County_Name'],
+    'vehicle': ['vehicle_rec_id', 'unit_number', 'Vehicle_Type', 'Collision_Report_Number'],
     'person': ['person_rec_id', 'Involved_Person_Type', 'Age', 'Gender']
 }
 
@@ -29,6 +29,7 @@ def export():
         print("entered export")
         pks = primary_keys
         for tbl_nm in tbls.keys():
+            print(f"exporting table {tbl_nm}...")
             # out_tbl = f"safety.{tbl_nm}"
             t_nm = source_tables[tbl_nm]
             columns = ','.join(tbls[tbl_nm])
@@ -36,7 +37,6 @@ def export():
                 SELECT {columns}
                 FROM safety.{t_nm} 
             """
-            print(query)
             df = e_conn.get_query(query)
             # dtype_clause = f"'{pks[tbl_nm]}': 'INTEGER PRIMARY KEY AUTOINCREMENT'"
             #df.to_sql(tbl_nm, sqlite_conn, if_exists='replace', index=False, dtype={pks[tbl_nm]: 'INTEGER PRIMARY KEY AUTOINCREMENT'})
