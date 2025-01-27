@@ -9,9 +9,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
 
 
-
 def get_db_connection():
-    sqlite_file_name = "safety4.sqlite"
+    sqlite_file_name = "safety5.sqlite"
     sqlite_url = f"sqlite:///{sqlite_file_name}?mode=ro"
     connect_args = {"check_same_thread": False}
     engine = create_engine(sqlite_url, connect_args=connect_args)
@@ -44,15 +43,21 @@ def get_session():
 
 
 class Incident(SQLModel, table=True):
-    Collision_Report_Number: str = Field(primary_key=True)
+    incident_rec_id: int = Field(primary_key=True)
+    Collision_Report_Number: str = Field()
     incident_date: str = Field()
     City_Name: str = Field()
+
+    vehicles: List["Vehicle"] = Relationship(back_populates="incident")
 
 class Vehicle(SQLModel, table=True):
     vehicle_rec_id: int = Field(primary_key=True)
     unit_number: int = Field()
     Vehicle_Type: str = Field()
-    #Collision_Report_Number: Optional(str) = Field(default=None, foreign_key="Incident.Collision_Report_Number")
+
+    incident_rec_id: Optional[int] = Field(default=None, foreign_key="incident.incident_rec_id")
+    #Collision_Report_Number: Optional[str] = Field(default=None, foreign_key="Incident.Collision_Report_Number")
+    incident: Optional[Incident] = Relationship(back_populates="vehicles")
 
 
 app  = FastAPI()
