@@ -2,7 +2,7 @@ import pandas as pd
 import psrcelmerpy
 import sqlite3 
 
-sqlite_path = "./main/safety5.sqlite"
+sqlite_path = "./main/safety.sqlite"
 
 e_conn = psrcelmerpy.ElmerConn()
 sqlite_conn =  sqlite3.connect(sqlite_path)
@@ -52,5 +52,27 @@ def export():
         print(f"exception in export routine: {e.args[0]}")
 
 export()
+
+sql = """alter table vehicle rename to vehicle_bak"""
+sqlite_conn.execute(sql)
+
+sql = """CREATE TABLE vehicle (
+    vehicle_rec_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    incident_rec_id INTEGER,
+    unit_number TEXT,
+    Vehicle_Type TEXT,
+    Collision_Report_Number TEXT,
+    FOREIGN KEY (incident_rec_id) REFERENCES incidents (incident_rec_id)
+)"""
+sqlite_conn.execute(sql)
+
+sql = """INSERT INTO vehicle (vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number)
+    SELECT vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number
+    from vehicle_bak
+    """
+sqlite_conn.execute(sql)
+
+sql = """drop table vehicle_bak"""
+sqlite_conn.execute(sql)
 
 sqlite_conn.close()
