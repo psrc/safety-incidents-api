@@ -19,6 +19,7 @@ class Incident(IncidentBase, table=True):
     #heroes: list["Hero"] = Relationship(back_populates="team")
     
     incident_rec_id: int = Field(primary_key=True)
+    City_Name: str = Field()
 
     vehicles: list["Vehicle"] = Relationship(back_populates="incident")
 
@@ -191,6 +192,13 @@ def read_incidents(
     limit: int = Query(default=100, le=100),
 ):
     incidents = session.exec(select(Incident).offset(offset).limit(limit)).all()
+    return incidents
+
+@app.get("/incidents/{City_Name}", response_model=list[IncidentPublicWithVehicles])
+def read_incidents_by_city(*, City_Name: str, session: Session = Depends(get_session)):
+    incidents = session.exec(select(Incident).where(Incident.City_Name==City_Name)).all()
+    if not incidents:
+        raise HTTPException(status_code=404, detail="Team not found")
     return incidents
 
 
