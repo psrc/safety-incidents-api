@@ -47,6 +47,7 @@ def get_session():
         session.close()
 
 class IncidentBase(SQLModel):
+    # incident_rec_id: int = Field(primary_key=True)
     City_Name: str = Field()
     County_Name: str = Field()
     Latitude: float = Field()
@@ -54,22 +55,25 @@ class IncidentBase(SQLModel):
 
 class Incident(IncidentBase, table=True):
     incident_rec_id: int = Field(primary_key=True)
-    City_Name: str = Field()
+    #City_Name: str = Field()
     # Collision_Report_Number: str = Field()
-    Incident_Date: str = Field()
+    #Incident_Date: str = Field()
 
     vehicles: list["Vehicle"] = Relationship(back_populates="incident")
 
 class IncidentCreate(IncidentBase):
     pass
 
-class IncidentPublic(IncidentBase):
-    incident_rec_id: int
+# class IncidentPublic(IncidentBase):
+#     incident_rec_id: int
     
 
 class VehicleBase(SQLModel):
-    unit_number: int = Field()
+    # unit_number: int = Field()
     Vehicle_Type: str = Field()
+    Vehicle_Make: str = Field()
+    Vehicle_Model: str = Field()
+    Vehicle_Style: str = Field()
 
     # incident_rec_id: Optional[int] = Field(default=None, foreign_key="incident.incident_rec_id")
     incident_rec_id: int | None = Field(default=None, foreign_key="incident.incident_rec_id")
@@ -81,19 +85,22 @@ class Vehicle(VehicleBase, table=True):
     incident: Incident | None = Relationship(back_populates="vehicles")
 
 
-class VehiclePublic(VehicleBase):
+# class VehiclePublic(VehicleBase):
+#     vehicle_rec_id: int
+
+class VehicleCreate(VehicleBase):
+    pass
+
+
+class VehiclePublicWithIncident(VehicleBase):
     vehicle_rec_id: int
+    incident: IncidentBase | None = None
 
 
-class VehiclePublicWithIncident(VehiclePublic):
-    incident: IncidentPublic | None = None
-
-
-class IncidentPublicWithVehicles(IncidentPublic):
-    #incident_rec_id: int
-    # Incident_Date: str
-    # vehicles: List["Vehicle"] = Relationship(back_populates="incident")
-    vehicles: list[VehiclePublic] = []
+class IncidentPublicWithVehicles(IncidentBase):
+    #vehicle_rec_id: int
+    incident_rec_id: int
+    vehicles: list[VehicleBase] = []
 
 app  = FastAPI()
 
