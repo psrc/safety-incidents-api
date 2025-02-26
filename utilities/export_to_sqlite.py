@@ -75,4 +75,19 @@ sqlite_conn.execute(sql)
 sql = """drop table vehicle_bak"""
 sqlite_conn.execute(sql)
 
+# Add indexes to improve query performance
+print("Adding indexes to tables...")
+
+# Indexes for incident table
+print("Adding indexes to incident table...")
+sqlite_conn.execute("CREATE INDEX idx_incident_collision_report_number ON incident(Collision_Report_Number)")
+sqlite_conn.execute("CREATE INDEX idx_incident_city_name ON incident(City_Name)")
+
+# Indexes for vehicle table
+print("Adding indexes to vehicle table...")
+sqlite_conn.execute("CREATE INDEX idx_vehicle_incident_rec_id ON vehicle(incident_rec_id)")
+sqlite_conn.execute("CREATE INDEX idx_vehicle_collision_report_number ON vehicle(Collision_Report_Number)")
+
+print("Indexes added successfully")
+
 sqlite_conn.close()
