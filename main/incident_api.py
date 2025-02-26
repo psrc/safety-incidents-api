@@ -10,7 +10,7 @@ from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, sele
 
 
 def get_db_connection():
-    sqlite_file_name = "safety2.sqlite"
+    sqlite_file_name = "safety.sqlite"
     sqlite_url = f"sqlite:///{sqlite_file_name}?mode=ro"
     connect_args = {"check_same_thread": False}
     engine = create_engine(sqlite_url, connect_args=connect_args)
