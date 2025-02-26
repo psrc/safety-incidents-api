@@ -117,16 +117,9 @@ async def get_incident(Collision_Report_Number: str):
         return incidents
 
 
-# @app.get("/incidents_by_city/{city_name}", response_model=list[IncidentPublicWithVehicles])
-# async def get_incidents_by_city(city_name: str):
-#     with Session(engine) as session:
-#         statement = select(Incident).where(Incident.City_Name == city_name)
-#         results = session.exec(statement)
-#         return results.all()
-    
-@app.get("/incidents_by_city/{City_Name}", response_model=IncidentPublicWithVehicles)
+@app.get("/incidents_by_city/{City_Name}", response_model=list[IncidentPublicWithVehicles])
 def get_incidents_by_city(*, City_Name: str, session: Session = Depends(get_session)):
-    results = session.exec(select(Incident).where(Incident.City_Name==City_Name)).first()
+    results = session.exec(select(Incident).where(Incident.City_Name==City_Name)).all()
     if not results:
         raise HTTPException(status_code=404, detail="No Incidents found")
     return results
