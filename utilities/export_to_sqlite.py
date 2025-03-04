@@ -8,8 +8,8 @@ e_conn = psrcelmerpy.ElmerConn()
 sqlite_conn =  sqlite3.connect(sqlite_path)
 
 tbls = {
-    'incident': ['incident_rec_id', 'Collision_Report_Number', 'incident_date', 'City_Name', 'County_Name'],
-    'vehicle': ['vehicle_rec_id', 'incident_rec_id', 'unit_number', 'Vehicle_Type', 'Collision_Report_Number'],
+    'incident': ['incident_rec_id', 'Collision_Report_Number', 'incident_date', 'City_Name', 'County_Name', 'Latitude', 'Longitude'],
+    'vehicle': ['vehicle_rec_id', 'incident_rec_id', 'unit_number', 'Vehicle_Type', 'Collision_Report_Number', 'Vehicle_Make', 'Vehicle_Model', 'Vehicle_Style'],
     'person': ['person_rec_id', 'Involved_Person_Type', 'Age', 'Gender']
 }
 
