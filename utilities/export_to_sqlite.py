@@ -8,22 +8,22 @@ e_conn = psrcelmerpy.ElmerConn()
 sqlite_conn =  sqlite3.connect(sqlite_path)
 
 tbls = {
-    'incident': ['incident_rec_id', 'Collision_Report_Number', 'incident_date', 'City_Name', 'County_Name', 'Latitude', 'Longitude'],
-    'vehicle': ['vehicle_rec_id', 'incident_rec_id', 'unit_number', 'Vehicle_Type', 'Collision_Report_Number', 'Vehicle_Make', 'Vehicle_Model', 'Vehicle_Style'],
-    'person': ['person_rec_id', 'Involved_Person_Type', 'Age', 'Gender']
+    'Incident': ['incident_rec_id', 'Collision_Report_Number', 'incident_date', 'City_Name', 'County_Name', 'Latitude', 'Longitude'],
+    'Vehicle': ['vehicle_rec_id', 'incident_rec_id', 'unit_number', 'Vehicle_Type', 'Collision_Report_Number', 'Vehicle_Make', 'Vehicle_Model', 'Vehicle_Style'],
+    'Person': ['person_rec_id', 'Involved_Person_Type', 'Age', 'Gender']
 }
 
 primary_keys = {
-    'incident': 'incident_rec_id',
-    'vehicle': 'vehicle_rec_id',
-    'person': 'person_rec_id'
+    'Incident': 'incident_rec_id',
+    'Vehicle': 'vehicle_rec_id',
+    'Person': 'person_rec_id'
 }
 
 foreign_keys = {
-    'vehicle': {'incident': 'incident_rec_id'}
+    'Vehicle': {'Incident': 'incident_rec_id'}
 }
 
-source_tables = {'incident': 'Incidents', 'vehicle': 'Vehicles', 'person': 'Persons'}
+source_tables = {'Incident': 'Incidents', 'Vehicle': 'Vehicles', 'Person': 'Persons'}
 
 # tbl_nm = 'vehicles'
 def export():
@@ -53,40 +53,47 @@ def export():
 
 export()
 
-sql = """alter table vehicle rename to vehicle_bak"""
+sql = """alter table Vehicle rename to vehicle_bak"""
 sqlite_conn.execute(sql)
 
-sql = """CREATE TABLE vehicle (
+sql = """CREATE TABLE Vehicle (
     vehicle_rec_id INTEGER PRIMARY KEY AUTOINCREMENT,
     incident_rec_id INTEGER,
     unit_number TEXT,
     Vehicle_Type TEXT,
     Collision_Report_Number TEXT,
-    FOREIGN KEY (incident_rec_id) REFERENCES incidents (incident_rec_id)
+    Vehicle_Make TEXT,
+    Vehicle_Model TEXT,
+    Vehicle_Style TEXT,
+    FOREIGN KEY(incident_rec_id) REFERENCES Incidents (incident_rec_id)
 )"""
 sqlite_conn.execute(sql)
 
-sql = """INSERT INTO vehicle (vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number)
-    SELECT vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number
-    from vehicle_bak
-    """
+print("copying data from vehicle_bak to Vehicle")
+sql = """INSERT INTO Vehicle (vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number, Vehicle_Make, Vehicle_Model, Vehicle_Style)
+    SELECT vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number, Vehicle_Make, Vehicle_Model, Vehicle_Style
+    from vehicle_bak"""
 sqlite_conn.execute(sql)
+sqlite_conn.commit()  # Commit the transaction to save the data
+print("...finished")
 
 sql = """drop table vehicle_bak"""
 sqlite_conn.execute(sql)
+sqlite_conn.commit()  # Commit the transaction to drop the table
 
 # Add indexes to improve query performance
 print("Adding indexes to tables...")
 
 # Indexes for incident table
-print("Adding indexes to incident table...")
-sqlite_conn.execute("CREATE INDEX idx_incident_collision_report_number ON incident(Collision_Report_Number)")
-sqlite_conn.execute("CREATE INDEX idx_incident_city_name ON incident(City_Name)")
+print("Adding indexes to Incident table...")
+sqlite_conn.execute("CREATE INDEX idx_incident_collision_report_number ON Incident(Collision_Report_Number)")
+sqlite_conn.execute("CREATE INDEX idx_incident_city_name ON Incident(City_Name)")
 
 # Indexes for vehicle table
-print("Adding indexes to vehicle table...")
-sqlite_conn.execute("CREATE INDEX idx_vehicle_incident_rec_id ON vehicle(incident_rec_id)")
-sqlite_conn.execute("CREATE INDEX idx_vehicle_collision_report_number ON vehicle(Collision_Report_Number)")
+print("Adding indexes to Vehicle table...")
+sqlite_conn.execute("CREATE INDEX idx_vehicle_incident_rec_id ON Vehicle(incident_rec_id)")
+sqlite_conn.execute("CREATE INDEX idx_vehicle_collision_report_number ON Vehicle(Collision_Report_Number)")
+sqlite_conn.commit()  # Commit the transaction to save the indexes
 
 print("Indexes added successfully")
 

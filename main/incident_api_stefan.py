@@ -113,7 +113,8 @@ class IncidentPublicWithVehicles(IncidentPublic):
     vehicles: list[VehiclePublic] = []
 
 
-sqlite_file_path = "C:/Stefan/temp/safety-incidents-api/main/safety.sqlite"
+#sqlite_file_path = "C:/Stefan/temp/safety-incidents-api/main/safety.sqlite"
+sqlite_file_path = "./safety.sqlite"
 sqlite_url = f"sqlite:///{sqlite_file_path}"
 
 connect_args = {"check_same_thread": False}
