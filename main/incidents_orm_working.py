@@ -98,6 +98,7 @@ class IncidentPublicWithVehicles(IncidentPublic):
 
 sqlite_file_name = "safety2.sqlite"
 sqlite_url = f"sqlite:///C:/Stefan/safety-incidents-api/main/{sqlite_file_name}"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
 
 connect_args = {"check_same_thread": False}
 engine = create_engine(sqlite_url, connect_args=connect_args)
@@ -149,41 +150,6 @@ def read_vehicle(*, session: Session = Depends(get_session), vehicle_rec_id: int
     return vehicle
 
 
-# @app.patch("/heroes/{hero_id}", response_model=HeroPublic)
-# def update_hero(
-#     *, session: Session = Depends(get_session), hero_id: int, hero: HeroUpdate
-# ):
-#     db_hero = session.get(Hero, hero_id)
-#     if not db_hero:
-#         raise HTTPException(status_code=404, detail="Hero not found")
-#     hero_data = hero.model_dump(exclude_unset=True)
-#     for key, value in hero_data.items():
-#         setattr(db_hero, key, value)
-#     session.add(db_hero)
-#     session.commit()
-#     session.refresh(db_hero)
-#     return db_hero
-
-
-# @app.delete("/heroes/{hero_id}")
-# def delete_hero(*, session: Session = Depends(get_session), hero_id: int):
-#     hero = session.get(Hero, hero_id)
-#     if not hero:
-#         raise HTTPException(status_code=404, detail="Hero not found")
-#     session.delete(hero)
-#     session.commit()
-#     return {"ok": True}
-
-
-# @app.post("/teams/", response_model=IncidentPublic)
-# def create_team(*, session: Session = Depends(get_session), team: TeamCreate):
-#     db_team = Team.model_validate(team)
-#     session.add(db_team)
-#     session.commit()
-#     session.refresh(db_team)
-#     return db_team
-
-
 @app.get("/incidents/", response_model=list[IncidentPublic])
 def read_incidents(
     *,
@@ -209,31 +175,3 @@ def read_incident(*, incident_rec_id: int, session: Session = Depends(get_sessio
         raise HTTPException(status_code=404, detail="Team not found")
     return incident
 
-
-# @app.patch("/teams/{team_id}", response_model=TeamPublic)
-# def update_team(
-#     *,
-#     session: Session = Depends(get_session),
-#     team_id: int,
-#     team: TeamUpdate,
-# ):
-#     db_team = session.get(Team, team_id)
-#     if not db_team:
-#         raise HTTPException(status_code=404, detail="Team not found")
-#     team_data = team.model_dump(exclude_unset=True)
-#     for key, value in team_data.items():
-#         setattr(db_team, key, value)
-#     session.add(db_team)
-#     session.commit()
-#     session.refresh(db_team)
-#     return db_team
-
-
-# @app.delete("/teams/{team_id}")
-# def delete_team(*, session: Session = Depends(get_session), team_id: int):
-#     team = session.get(Team, team_id)
-#     if not team:
-#         raise HTTPException(status_code=404, detail="Team not found")
-#     session.delete(team)
-#     session.commit()
-#     return {"ok": True}
