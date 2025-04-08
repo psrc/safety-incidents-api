@@ -20,8 +20,8 @@ sqlite_url = f"sqlite:///{sqlite_file_path}"
 
 con = sqlite3.connect(sqlite_file_path)
 
-vehicles = pd.read_sql_query("SELECT * from Vehicle", con)
-incidents = pd.read_sql_query("SELECT * from Incident", con)
+# vehicles = pd.read_sql_query("SELECT * from Vehicle", con)
+# incidents = pd.read_sql_query("SELECT * from Incident", con)
 
 
 class Incidents(pa.DataFrameModel):
@@ -50,6 +50,17 @@ class Vehicles(pa.DataFrameModel):
     class Config:
         coerce = True
 
+class Persons(pa.DataFrameModel):
+    person_rec_id: Series[int] = pa.Field()
+    # Collision_Report_Number: Series[str] = pa.Field()
+    # Involved_Person_Type: Series[str] = pa.Field()
+    # Age: Series[str] = pa.Field()
+    Involved_Person_Type: Series[str] = pa.Field()
+    # Injury_Type: Series[str] = pa.Field()
+
+    class Config:
+        coerce = True
+
 
 vehicles = pd.read_sql_query("SELECT * from Vehicle", con)
 try:
@@ -60,6 +71,12 @@ except pa.errors.SchemaError as exc:
 incidents = pd.read_sql_query("SELECT * from Incident", con)
 try:
     Incidents.validate(incidents)
+except pa.errors.SchemaError as exc:
+    print(exc)
+
+persons = pd.read_sql_query("SELECT * from Person", con)
+try:
+    Persons.validate(persons)
 except pa.errors.SchemaError as exc:
     print(exc)
 
@@ -82,4 +99,14 @@ def get_vehicles_by_id(ids: List[str] | None = Query(None)):
     else:
         return Response(
             vehicles.to_json(orient="records"), media_type="application/json"
+        )
+    
+@app.get("/persons/", response_model=DataFrame[Persons])
+def get_persons_by_id(ids: List[str] | None = Query(None)):
+    if ids:
+        df = persons[persons["person_rec_id"].isin(ids)]
+        return Response(df.to_json(orient="records"), media_type="application/json")
+    else:
+        return Response(
+            persons.to_json(orient="records"), media_type="application/json"
         )
