@@ -9,4 +9,4 @@ To run the api (from the ./main folder), execute the following command at the te
 
 `uvicorn incident_api_pandas:app --host "0.0.0.0" --port 8000 --reload`
 
-This will host the api at localhost:8000. To interact with the UI, go to [http://localhost:8000/docs#/default]
+This will host the api at localhost:8000. To interact with the UI, go to `http://localhost:8000/docs#/default`
