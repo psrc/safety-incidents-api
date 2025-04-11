@@ -2,7 +2,7 @@ import pandas as pd
 import psrcelmerpy
 import sqlite3 
 
-sqlite_path = "./main/safety.sqlite"
+sqlite_path = "./main/safety3.sqlite"
 
 e_conn = psrcelmerpy.ElmerConn()
 sqlite_conn =  sqlite3.connect(sqlite_path)
@@ -10,7 +10,7 @@ sqlite_conn =  sqlite3.connect(sqlite_path)
 tbls = {
     'Incident': ['incident_rec_id', 'Collision_Report_Number', 'incident_date', 'City_Name', 'County_Name', 'Latitude', 'Longitude'],
     'Vehicle': ['vehicle_rec_id', 'incident_rec_id', 'unit_number', 'Vehicle_Type', 'Collision_Report_Number', 'Vehicle_Make', 'Vehicle_Model', 'Vehicle_Style'],
-    'Person': ['person_rec_id', 'Involved_Person_Type', 'Age', 'Gender']
+    'Person': ['person_rec_id', 'vehicle_rec_id', 'Collision_Report_Number', 'Involved_Person_Type', 'Age', 'Gender', 'Injury_Type', 'Impairment_Status']
 }
 
 primary_keys = {

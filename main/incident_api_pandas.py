@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException, Query, APIRouter, Response, Request
 import pandas as pd
 import json
-from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
+#from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
 import sqlite3
 from fastapi.responses import StreamingResponse
 import io
@@ -15,7 +15,7 @@ from pandera.typing import Index, DataFrame, Series
 
 app = FastAPI()
 # df = pd.read_csv("file.csv")
-sqlite_file_path = "./safety.sqlite"
+sqlite_file_path = "./safety3.sqlite"
 sqlite_url = f"sqlite:///{sqlite_file_path}"
 
 con = sqlite3.connect(sqlite_file_path)
@@ -40,11 +40,11 @@ class Incidents(pa.DataFrameModel):
 class Vehicles(pa.DataFrameModel):
     vehicle_rec_id: Series[int] = pa.Field()
     incident_rec_id: Series[int] = pa.Field()
-    Collision_Report_Number: Series[str] = pa.Field()
     unit_number: Series[int] = pa.Field()
     Vehicle_Type: Series[str] = pa.Field()
-    Vehicle_Model: Series[str] = pa.Field()
+    Collision_Report_Number: Series[str] = pa.Field()
     Vehicle_Make: Series[str] = pa.Field()
+    Vehicle_Model: Series[str] = pa.Field()
     Vehicle_Style: Series[str] = pa.Field()
 
     class Config:
@@ -52,9 +52,9 @@ class Vehicles(pa.DataFrameModel):
 
 class Persons(pa.DataFrameModel):
     person_rec_id: Series[int] = pa.Field()
-    # Collision_Report_Number: Series[str] = pa.Field()
+    Collision_Report_Number: Series[str] = pa.Field()
     # Involved_Person_Type: Series[str] = pa.Field()
-    # Age: Series[str] = pa.Field()
+    Age: Series[str] = pa.Field()
     Involved_Person_Type: Series[str] = pa.Field()
     # Injury_Type: Series[str] = pa.Field()
 
@@ -93,8 +93,9 @@ def get_incidents(County_Name: str | None = None, City_Name: str | None = None):
 
 @app.get("/vehicles/", response_model=DataFrame[Vehicles])
 def get_vehicles_by_id(ids: List[str] | None = Query(None)):
+    df = vehicles.copy()
     if ids:
-        df = vehicles[vehicles["Collision_Report_Number"].isin(ids)]
+        df = df[df["Collision_Report_Number"].isin(ids)]
         return Response(df.to_json(orient="records"), media_type="application/json")
     else:
         return Response(
@@ -103,8 +104,12 @@ def get_vehicles_by_id(ids: List[str] | None = Query(None)):
     
 @app.get("/persons/", response_model=DataFrame[Persons])
 def get_persons_by_id(ids: List[str] | None = Query(None)):
+    dfp = persons.copy()
+    dfi = incidents.copy()
     if ids:
-        df = persons[persons["person_rec_id"].isin(ids)]
+        dfi = dfi[dfi["Collision_Report_Number"].isin(ids)]
+        dfp = dfp[dfp["Collision_Report_Number"].isin(ids)]
+        df = dfp.merge(dfi, on="Collision_Report_Number", how="inner")
         return Response(df.to_json(orient="records"), media_type="application/json")
     else:
         return Response(
