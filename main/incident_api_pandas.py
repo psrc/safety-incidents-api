@@ -102,16 +102,17 @@ def get_vehicles_by_id(ids: List[str] | None = Query(None)):
             vehicles.to_json(orient="records"), media_type="application/json"
         )
     
-@app.get("/persons/", response_model=DataFrame[Persons])
+@app.get("/persons/")
 def get_persons_by_id(ids: List[str] | None = Query(None)):
-    dfp = persons.copy()
-    dfi = incidents.copy()
+    # dfp = persons.copy()
+    # dfi = incidents.copy()
     if ids:
-        dfi = dfi[dfi["Collision_Report_Number"].isin(ids)]
-        dfp = dfp[dfp["Collision_Report_Number"].isin(ids)]
-        df = dfp.merge(dfi, on="Collision_Report_Number", how="inner")
-        return Response(df.to_json(orient="records"), media_type="application/json")
-    else:
-        return Response(
-            persons.to_json(orient="records"), media_type="application/json"
-        )
+        dfi = incidents[incidents["Collision_Report_Number"].isin(ids)]
+        dfp = persons[persons["Collision_Report_Number"].isin(ids)]
+    result = []
+    for report_num, incident_group in dfi.groupby("Collision_Report_Number"):
+        incident_data = incident_group.iloc[0].to_dict()
+        incident_data["persons"] = json.loads(dfp.to_json(orient="records"))
+        result.append(incident_data)
+    
+    return Response(json.dumps(result), media_type="application/json")
