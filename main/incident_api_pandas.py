@@ -15,7 +15,7 @@ from pandera.typing import Index, DataFrame, Series
 
 app = FastAPI()
 # df = pd.read_csv("file.csv")
-sqlite_file_path = "./safety3.sqlite"
+sqlite_file_path = "./safety.sqlite"
 sqlite_url = f"sqlite:///{sqlite_file_path}"
 
 con = sqlite3.connect(sqlite_file_path)
@@ -104,8 +104,6 @@ def get_vehicles_by_id(ids: List[str] | None = Query(None)):
     
 @app.get("/persons/")
 def get_persons_by_id(ids: List[str] | None = Query(None)):
-    # dfp = persons.copy()
-    # dfi = incidents.copy()
     if ids:
         dfi = incidents[incidents["Collision_Report_Number"].isin(ids)]
         dfp = persons[persons["Collision_Report_Number"].isin(ids)]

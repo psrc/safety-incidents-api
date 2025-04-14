@@ -2,7 +2,7 @@ import pandas as pd
 import psrcelmerpy
 import sqlite3 
 
-sqlite_path = "./main/safety3.sqlite"
+sqlite_path = "./main/safety.sqlite"
 
 e_conn = psrcelmerpy.ElmerConn()
 sqlite_conn =  sqlite3.connect(sqlite_path)
