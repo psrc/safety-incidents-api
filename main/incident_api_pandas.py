@@ -14,14 +14,11 @@ import pandera as pa
 from pandera.typing import Index, DataFrame, Series
 
 app = FastAPI()
-# df = pd.read_csv("file.csv")
 sqlite_file_path = "./safety.sqlite"
 sqlite_url = f"sqlite:///{sqlite_file_path}"
 
 con = sqlite3.connect(sqlite_file_path)
 
-# vehicles = pd.read_sql_query("SELECT * from Vehicle", con)
-# incidents = pd.read_sql_query("SELECT * from Incident", con)
 
 
 class Incidents(pa.DataFrameModel):

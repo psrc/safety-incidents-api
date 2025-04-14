@@ -25,14 +25,12 @@ foreign_keys = {
 
 source_tables = {'Incident': 'Incidents', 'Vehicle': 'Vehicles', 'Person': 'Persons'}
 
-# tbl_nm = 'vehicles'
 def export():
     try: 
         print("entered export")
         pks = primary_keys
         for tbl_nm in tbls.keys():
             print(f"exporting table {tbl_nm}...")
-            # out_tbl = f"safety.{tbl_nm}"
             t_nm = source_tables[tbl_nm]
             columns = ','.join(tbls[tbl_nm])
             query = f"""
@@ -40,9 +38,7 @@ def export():
                 FROM safety.{t_nm} 
             """
             df = e_conn.get_query(query)
-            # dtype_clause = f"'{pks[tbl_nm]}': 'INTEGER PRIMARY KEY AUTOINCREMENT'"
             df.to_sql(tbl_nm, sqlite_conn, if_exists='replace', index=False, dtype={pks[tbl_nm]: 'INTEGER PRIMARY KEY AUTOINCREMENT'})
-            #df.to_sql(tbl_nm, sqlite_conn, if_exists='replace', index=False)
             rows_processed = len(df)
             print(f"Processed {rows_processed} rows for {tbl_nm}")
 
