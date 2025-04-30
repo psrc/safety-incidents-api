@@ -80,20 +80,57 @@ except pa.errors.SchemaError as exc:
 
 @app.get("/incidents", response_model=DataFrame[Incidents])
 def get_incidents(County_Name: str | None = None, City_Name: str | None = None):
-    df = incidents.copy()
+    dfi = incidents.copy()
     if County_Name:
-        df = df[df["County_Name"] == County_Name]
+        dfi = dfi[dfi["County_Name"] == County_Name]
     if City_Name:
-        df = df[df["City_Name"] == City_Name]
-    return Response(df.to_json(orient="records"), media_type="application/json")
+        dfi = dfi[dfi["City_Name"] == City_Name]
+    return Response(dfi.to_json(orient="records"), media_type="application/json")
 
+@app.get("/incidents_by_id/", response_model=DataFrame[Vehicles])
+def get_incidents_by_id(ids: List[str] | None = Query(None)):
+    dfv, dfi, dfp = vehicles.copy(), incidents.copy(), persons.copy()
+    if ids:
+        dfv = dfv[dfv["Collision_Report_Number"].isin(ids)]
+        dfi = dfi[dfi["Collision_Report_Number"].isin(ids)]
+        dfp = dfp[dfp["Collision_Report_Number"].isin(ids)]
+        result = []
+        for report_num, incident_group in dfi.groupby("Collision_Report_Number"):
+            incident_data = incident_group.iloc[0].to_dict()
+            incident_vehicles = dfv[dfv["Collision_Report_Number"] == report_num].copy()
+            vehicles_list = []
+            
+            # For each vehicle, add associated persons
+            for _, vehicle in incident_vehicles.iterrows():
+                vehicle_data = vehicle.to_dict()
+                # Get persons associated with this specific vehicle using vehicle_rec_id
+                vehicle_persons = dfp[dfp["vehicle_rec_id"] == vehicle_data["vehicle_rec_id"]].copy()
+                vehicle_data["persons"] = json.loads(vehicle_persons.to_json(orient="records"))
+                vehicles_list.append(vehicle_data)
+            
+            incident_data["vehicles"] = vehicles_list
+            result.append(incident_data)
+            
+        return Response(json.dumps(result), media_type="application/json")
+    else:
+        return Response(
+            vehicles.to_json(orient="records"), media_type="application/json"
+        )
 
 @app.get("/vehicles/", response_model=DataFrame[Vehicles])
 def get_vehicles_by_id(ids: List[str] | None = Query(None)):
-    df = vehicles.copy()
+    dfv = vehicles.copy()
+    dfi = incidents.copy()
     if ids:
-        df = df[df["Collision_Report_Number"].isin(ids)]
-        return Response(df.to_json(orient="records"), media_type="application/json")
+        dfv = dfv[dfv["Collision_Report_Number"].isin(ids)]
+        dfi = dfi[dfi["Collision_Report_Number"].isin(ids)]
+        result = []
+        for report_num, incident_group in dfi.groupby("Collision_Report_Number"):
+            incident_data = incident_group.iloc[0].to_dict()
+            incident_data["vehicles"] = json.loads(dfv.to_json(orient="records"))
+            result.append(incident_data)
+            
+        return Response(json.dumps(result), media_type="application/json")
     else:
         return Response(
             vehicles.to_json(orient="records"), media_type="application/json"
