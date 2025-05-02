@@ -9,7 +9,7 @@ sqlite_conn =  sqlite3.connect(sqlite_path)
 
 tbls = {
     'Incident': ['incident_rec_id', 'Collision_Report_Number', 'incident_date', 'City_Name', 'County_Name', 'Latitude', 'Longitude'],
-    'Vehicle': ['vehicle_rec_id', 'incident_rec_id', 'unit_number', 'Vehicle_Type', 'Collision_Report_Number', 'Vehicle_Make', 'Vehicle_Model', 'Vehicle_Style'],
+    'Vehicle': ['vehicle_rec_id', 'incident_rec_id', 'unit_number', 'Vehicle_Type', 'Collision_Report_Number', 'Vehicle_Make', 'Vehicle_Model', 'Vehicle_Style','VIN'],
     'Person': ['person_rec_id', 'vehicle_rec_id', 'Collision_Report_Number', 'Involved_Person_Type', 'Age', 'Gender', 'Injury_Type', 'Impairment_Status']
 }
 
@@ -61,13 +61,14 @@ sql = """CREATE TABLE Vehicle (
     Vehicle_Make TEXT,
     Vehicle_Model TEXT,
     Vehicle_Style TEXT,
+    VIN TEXT,
     FOREIGN KEY(incident_rec_id) REFERENCES Incidents (incident_rec_id)
 )"""
 sqlite_conn.execute(sql)
 
 print("copying data from vehicle_bak to Vehicle")
-sql = """INSERT INTO Vehicle (vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number, Vehicle_Make, Vehicle_Model, Vehicle_Style)
-    SELECT vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number, Vehicle_Make, Vehicle_Model, Vehicle_Style
+sql = """INSERT INTO Vehicle (vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number, Vehicle_Make, Vehicle_Model, Vehicle_Style, VIN)
+    SELECT vehicle_rec_id, incident_rec_id, unit_number, Vehicle_Type, Collision_Report_Number, Vehicle_Make, Vehicle_Model, Vehicle_Style, VIN
     from vehicle_bak"""
 sqlite_conn.execute(sql)
 sqlite_conn.commit()  # Commit the transaction to save the data
@@ -88,6 +89,7 @@ sqlite_conn.execute("CREATE INDEX idx_incident_city_name ON Incident(City_Name)"
 # Indexes for vehicle table
 print("Adding indexes to Vehicle table...")
 sqlite_conn.execute("CREATE INDEX idx_vehicle_incident_rec_id ON Vehicle(incident_rec_id)")
+sqlite_conn.execute("CREATE INDEX idx_vehicle_vin ON Vehicle(VIN)")
 sqlite_conn.execute("CREATE INDEX idx_vehicle_collision_report_number ON Vehicle(Collision_Report_Number)")
 sqlite_conn.commit()  # Commit the transaction to save the indexes
 

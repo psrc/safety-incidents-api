@@ -37,6 +37,7 @@ class Incidents(pa.DataFrameModel):
 class Vehicles(pa.DataFrameModel):
     vehicle_rec_id: Series[int] = pa.Field()
     incident_rec_id: Series[int] = pa.Field()
+    VIN: Series[str] = pa.Field()
     unit_number: Series[int] = pa.Field()
     Vehicle_Type: Series[str] = pa.Field()
     Collision_Report_Number: Series[str] = pa.Field()
@@ -122,12 +123,15 @@ def get_vehicles_by_id(ids: List[str] | None = Query(None)):
     dfv = vehicles.copy()
     dfi = incidents.copy()
     if ids:
-        dfv = dfv[dfv["Collision_Report_Number"].isin(ids)]
-        dfi = dfi[dfi["Collision_Report_Number"].isin(ids)]
+        dfv = dfv[dfv["VIN"].isin(ids)]
+        df_merged = pd.merge(dfi, dfv, on='Collision_Report_Number', how='inner')
+        df_merged.rename(columns = {'incident_rec_id_x': 'incident_rec_id'}, inplace=True)
+        dfi = df_merged[dfi.columns]
         result = []
-        for report_num, incident_group in dfi.groupby("Collision_Report_Number"):
+        for incident_num, incident_group in dfi.groupby("Collision_Report_Number"):
             incident_data = incident_group.iloc[0].to_dict()
-            incident_data["vehicles"] = json.loads(dfv.to_json(orient="records"))
+            df_veh = dfv[dfv['Collision_Report_Number'] == incident_num].copy()
+            incident_data['vehicle'] = json.loads(df_veh.to_json(orient="records"))
             result.append(incident_data)
             
         return Response(json.dumps(result), media_type="application/json")
