@@ -119,18 +119,18 @@ def get_incidents_by_id(ids: List[str] | None = Query(None)):
         )
 
 @app.get("/vehicles/", response_model=DataFrame[Vehicles])
-def get_vehicles_by_id(ids: List[str] | None = Query(None)):
+def get_vehicles_by_id(vins: List[str] | None = Query(None)):
     dfv = vehicles.copy()
     dfi = incidents.copy()
-    if ids:
-        dfv = dfv[dfv["VIN"].isin(ids)]
+    if vins:
+        dfv = dfv[dfv["VIN"].isin(vins)]
         df_merged = pd.merge(dfi, dfv, on='Collision_Report_Number', how='inner')
         df_merged.rename(columns = {'incident_rec_id_x': 'incident_rec_id'}, inplace=True)
         dfi = df_merged[dfi.columns]
         result = []
         for incident_num, incident_group in dfi.groupby("Collision_Report_Number"):
             incident_data = incident_group.iloc[0].to_dict()
-            df_veh = dfv[dfv['Collision_Report_Number'] == incident_num].copy()
+            df_veh = dfv[dfv['Collision_Report_Number'] == incident_num].copy() # filter by collision in case of multipe incidents
             incident_data['vehicle'] = json.loads(df_veh.to_json(orient="records"))
             result.append(incident_data)
             
