@@ -1,0 +1,29 @@
+project:
+  type: book
+  output-dir: "demo-notebook"
+  
+book:
+  title: "Safety API Demo"
+  repo-url: https://github.com/psrc/safety-incidents-api/tree/main
+  search: false
+  sidebar:
+    logo: PSRClogo2016path.png
+
+  chapters:
+    - index.qmd
+    - api_demo.ipynb
+
+format:
+  html:
+    mainfont: Poppins
+    theme: 
+      light: [cosmo, custom.scss]
+      dark: [darkly, custom.scss]
+    echo: true
+    code-tools: true
+
+toc: true
+
+
+
+
