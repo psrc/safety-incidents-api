@@ -12,6 +12,7 @@ book:
   chapters:
     - index.qmd
     - api_demo.ipynb
+    # valid Quarto inputs (.qmd, .ipynb, .md, .Rmd)
 
 format:
   html:
